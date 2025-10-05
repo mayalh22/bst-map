@@ -3,55 +3,46 @@ use std::io::{self, Write};
 fn main() {
     let mut current_scene = 0;
     loop {
-                match current_scene {
+        match current_scene {
             0 => {
-
-        println!("you wake up at fenway.");
-        println!("what do you want to do?");
-        println!("1. take the t to newbury?");
-        println!("2. follow a rat up the street?");
-        println!("3. take the t west to newton?");
-        println!("4. quit");
-        print!("> Choose 1, 2, 3, or 4: ");
-        io::stdout().flush().unwrap();
-
-        let mut input = String::new();
-        io::stdin().read_line(&mut input).expect("failed to read line");
-current_scene = match input.trim() {
-    "1" => 1,
-    "2" => {
-        println!("you find a secret stash of burritos.");
-        0
-    },
-    "3" => {
-        println!("the train gets stuck!.");
-        0
-    },
-    "4" => {
-        println!("you decide to quit. goodbye!");
-        break;
-    }, 
-    _ => {
-        println!("invalid choice. a pigeon attacks you.");
-        0
-    }
-};
-            },
-1 =>{
-                println!("\nyou arrive at newbury. you see a boba shop.");
-                println!("1. do you get the boba?");
-                println!("2. do you walk past it?");
-                println!("3. go back to fenway");
-                print!("> choose 1, 2, or 3: ");
+                println!("you wake up at fenway.");
+                println!("what do you want to do?");
+                println!("1. take the t to newbury");
+                println!("2. follow a rat up the street");
+                println!("3. take the t west to newton");
+                println!("4. quit");
+                print!("> choose 1, 2, 3, or 4: ");
                 io::stdout().flush().unwrap();
 
                 let mut input = String::new();
                 io::stdin().read_line(&mut input).expect("failed to read line");
-
                 current_scene = match input.trim() {
-                    "1" => 10,
-                    "2" => 20,
-                    "3" => 0,
+                    "1" => 1,
+                    "2" => 2,
+                    "3" => 3,
+                    "4" => {
+                        println!("you decide to quit. goodbye!");
+                        break;
+                    }
+                    _ => {
+                        println!("invalid choice. try again.");
+                        0
+                    }
+                };
+            }
+
+            1 => {
+                println!("you arrive at newbury. there's a boba shop.");
+                println!("1. get a boba");
+                println!("2. keep walking");
+                print!("> choose 1 or 2: ");
+                io::stdout().flush().unwrap();
+
+                let mut input = String::new();
+                io::stdin().read_line(&mut input).expect("failed to read line");
+                current_scene = match input.trim() {
+                    "1" => 4,
+                    "2" => 5,
                     _ => {
                         println!("invalid choice. try again.");
                         1
@@ -59,142 +50,244 @@ current_scene = match input.trim() {
                 };
             }
 
-            10 => {
-                println!("\na brandy melville employee cuts in front of line.");
-                println!("1. confront her");
-                println!("2. wait your turn");
-                println!("3. go back");
-                print!("> choose 1, 2, or 3: ");
+            2 => {
+                println!("you follow the rat into an alley.");
+                println!("1. chase it");
+                println!("2. ignore it and explore the alley");
+                print!("> choose 1 or 2: ");
                 io::stdout().flush().unwrap();
 
                 let mut input = String::new();
                 io::stdin().read_line(&mut input).expect("failed to read line");
-
                 current_scene = match input.trim() {
-                    "1" => 11,
-                    "2" => 12,
-                    "3" => 1,
+                    "1" => 6,
+                    "2" => 7,
                     _ => {
                         println!("invalid choice. try again.");
-                        10
+                        2
                     }
                 };
+            }
+
+            3 => {
+                println!("you arrive in newton.");
+                println!("1. visit a local cafe");
+                println!("2. walk through the park");
+                print!("> choose 1 or 2: ");
+                io::stdout().flush().unwrap();
+
+                let mut input = String::new();
+                io::stdin().read_line(&mut input).expect("failed to read line");
+                current_scene = match input.trim() {
+                    "1" => 8,
+                    "2" => 9,
+                    _ => {
+                        println!("invalid choice. try again.");
+                        3
+                    }
+                };
+            }
+
+            4 => {
+                println!("you enjoy the boba, but notice someone suspicious.");
+                println!("1. confront them");
+                println!("2. ignore and sip");
+                print!("> choose 1 or 2: ");
+                io::stdout().flush().unwrap();
+
+                let mut input = String::new();
+                io::stdin().read_line(&mut input).expect("failed to read line");
+                current_scene = match input.trim() {
+                    "1" => 10,
+                    "2" => 11,
+                    _ => {
+                        println!("invalid choice. try again.");
+                        4
+                    }
+                };
+            }
+
+            5 => {
+                println!("walking past the boba shop, you see a bookstore.");
+                println!("1. enter the bookstore");
+                println!("2. keep walking");
+                print!("> choose 1 or 2: ");
+                io::stdout().flush().unwrap();
+
+                let mut input = String::new();
+                io::stdin().read_line(&mut input).expect("failed to read line");
+                current_scene = match input.trim() {
+                    "1" => 12,
+                    "2" => 13,
+                    _ => {
+                        println!("invalid choice. try again.");
+                        5
+                    }
+                };
+            }
+
+            6 => {
+                println!("the rat leads you to a hidden door.");
+                println!("1. open it");
+                println!("2. stay outside");
+                print!("> choose 1 or 2: ");
+                io::stdout().flush().unwrap();
+
+                let mut input = String::new();
+                io::stdin().read_line(&mut input).expect("failed to read line");
+                current_scene = match input.trim() {
+                    "1" => 14,
+                    "2" => 15,
+                    _ => {
+                        println!("invalid choice. try again.");
+                        6
+                    }
+                };
+            }
+
+            7 => {
+                println!("exploring the alley, you find a strange graffiti.");
+                println!("1. take a picture");
+                println!("2. ignore it");
+                print!("> choose 1 or 2: ");
+                io::stdout().flush().unwrap();
+
+                let mut input = String::new();
+                io::stdin().read_line(&mut input).expect("failed to read line");
+                current_scene = match input.trim() {
+                    "1" => 16,
+                    "2" => 17,
+                    _ => {
+                        println!("invalid choice. try again.");
+                        7
+                    }
+                };
+            }
+
+            8 => {
+                println!("in the cafe, you see an old friend.");
+                println!("1. say hi");
+                println!("2. keep to yourself");
+                print!("> choose 1 or 2: ");
+                io::stdout().flush().unwrap();
+
+                let mut input = String::new();
+                io::stdin().read_line(&mut input).expect("failed to read line");
+                current_scene = match input.trim() {
+                    "1" => 18,
+                    "2" => 19,
+                    _ => {
+                        println!("invalid choice. try again.");
+                        8
+                    }
+                };
+            }
+
+            9 => {
+                println!("walking in the park, you find a lost dog.");
+                println!("1. help the dog");
+                println!("2. ignore it");
+                print!("> choose 1 or 2: ");
+                io::stdout().flush().unwrap();
+
+                let mut input = String::new();
+                io::stdin().read_line(&mut input).expect("failed to read line");
+                current_scene = match input.trim() {
+                    "1" => 20,
+                    "2" => 21,
+                    _ => {
+                        println!("invalid choice. try again.");
+                        9
+                    }
+                };
+            }
+
+            10 => {
+                println!("you confront the suspicious person and they smile kindly.");
+                println!("press enter to continue.");
+                let _ = io::stdin().read_line(&mut String::new());
+                break;
             }
 
             11 => {
-                println!("\nshe apologizes and pays for your drink.");
-                println!("press enter to go back to newbury.");
+                println!("you ignore them and finish your drink peacefully.");
+                println!("press enter to continue.");
                 let _ = io::stdin().read_line(&mut String::new());
-                current_scene = 1;
+                break;
             }
 
             12 => {
-                println!("\nyou get your drink! unfortunately, a rat bumps into you and you spill it.");
-                println!("press enter to go back to newbury.");
+                println!("inside the bookstore, you find a rare edition.");
+                println!("press enter to continue.");
                 let _ = io::stdin().read_line(&mut String::new());
-                current_scene = 1;
+                break;
+            }
+
+            13 => {
+                println!("you keep walking and enjoy the fresh air.");
+                println!("press enter to continue.");
+                let _ = io::stdin().read_line(&mut String::new());
+                break;
+            }
+
+            14 => {
+                println!("opening the door, you discover a hidden speakeasy.");
+                println!("press enter to continue.");
+                let _ = io::stdin().read_line(&mut String::new());
+                break;
+            }
+
+            15 => {
+                println!("you decide to stay outside and rest on the steps.");
+                println!("press enter to continue.");
+                let _ = io::stdin().read_line(&mut String::new());
+                break;
+            }
+
+            16 => {
+                println!("the graffiti inspires you to create art.");
+                println!("press enter to continue.");
+                let _ = io::stdin().read_line(&mut String::new());
+                break;
+            }
+
+            17 => {
+                println!("you ignore the graffiti and move on.");
+                println!("press enter to continue.");
+                let _ = io::stdin().read_line(&mut String::new());
+                break;
+            }
+
+            18 => {
+                println!("your friend invites you to join a book club.");
+                println!("press enter to continue.");
+                let _ = io::stdin().read_line(&mut String::new());
+                break;
+            }
+
+            19 => {
+                println!("you keep to yourself and finish your coffee quietly.");
+                println!("press enter to continue.");
+                let _ = io::stdin().read_line(&mut String::new());
+                break;
             }
 
             20 => {
-                println!("\nyou walk past it.");
-                println!("1. go to newbury comics");
-                println!("2. go to trident booksellers");
-                println!("3. go back");
-                print!("> choose 1, 2, or 3: ");
-                io::stdout().flush().unwrap();
-
-                let mut input = String::new();
-                io::stdin().read_line(&mut input).expect("failed to read line");
-
-                current_scene = match input.trim() {
-                    "1" => 21,
-                    "2" => 30,
-                    "3" => 1,
-                    _ => {
-                        println!("invalid choice. try again.");
-                        20
-                    }
-                };
+                println!("the lost dog becomes your loyal companion.");
+                println!("press enter to continue.");
+                let _ = io::stdin().read_line(&mut String::new());
+                break;
             }
 
             21 => {
-                println!("\nyou enter newbury comics.");
-                println!("1. buy a blind box");
-                println!("2. buy a vinyl");
-                println!("3. go back");
-                print!("> choose 1, 2, or 3: ");
-                io::stdout().flush().unwrap();
-
-                let mut input = String::new();
-                io::stdin().read_line(&mut input).expect("failed to read line");
-
-                current_scene = match input.trim() {
-                    "1" => 22,
-                    "2" => 23,
-                    "3" => 20,
-                    _ => {
-                        println!("invalid choice. try again.");
-                        21
-                    }
-                };
-            }
-
-            22 => {
-                println!("\nyou buy a blind box.");
-                println!("you leave the store excited! unfortunately, a rat steals it out of your bag.");
-                println!("press enter to go back to newbury comics.");
+                println!("you ignore the dog and enjoy your walk alone.");
+                println!("press enter to continue.");
                 let _ = io::stdin().read_line(&mut String::new());
-                current_scene = 21;
-            }
-
-            23 => {
-                println!("\nyou buy a vinyl.");
-                println!("the employee compliments your taste.");
-                println!("press enter to go back to newbury comics.");
-                let _ = io::stdin().read_line(&mut String::new());
-                current_scene = 21;
-            }
-
-            30 => {
-                println!("\nyou arrive at trident booksellers.");
-                println!("1. try and get some work done in the cafe");
-                println!("2. look for a new book");
-                println!("3. go back");
-                print!("> choose 1, 2, or 3: ");
-                io::stdout().flush().unwrap();
-
-                let mut input = String::new();
-                io::stdin().read_line(&mut input).expect("failed to read line");
-
-                current_scene = match input.trim() {
-                    "1" => 31,
-                    "2" => 32,
-                    "3" => 20,
-                    _ => {
-                        println!("invalid choice. try again.");
-                        30
-                    }
-                };
-            }
-
-            31 => {
-                println!("\nyou try and get some work done in the cafe.");
-                println!("the cafe is closed! a rat gives you company as you sit on the curb.");
-                println!("press enter to go back to trident booksellers.");
-                let _ = io::stdin().read_line(&mut String::new());
-                current_scene = 30;
-            }
-
-            32 => {
-                println!("\nyou look for a new book.");
-                println!("you find a great book!");
-                println!("press enter to go back to trident booksellers.");
-                let _ = io::stdin().read_line(&mut String::new());
-                current_scene = 30;
+                break;
             }
 
             _ => {
-                println!("something went wrong. going back to fenway.");
+                println!("something went wrong. returning to fenway.");
                 current_scene = 0;
             }
         }
