@@ -1,10 +1,5 @@
 use std::io::{self, Write};
 
-struct Scene {
-    description: &'static str,
-    options: Vec(& 'static str, usize)>,
-}
-
 fn main() {
     println!("you wake up at fenway.");
     println!("what do you want to do?");
