@@ -13,3 +13,4 @@ i wanted to learn a new language because i so have been stuck in the html/css/js
 i may try and work on more story branches, images, and user interface stuff in the future
 
 for now, enjoy!
+[![Athena Award Badge](https://img.shields.io/endpoint?url=https%3A%2F%2Faward.athena.hackclub.com%2Fapi%2Fbadge)](https://award.athena.hackclub.com?utm_source=readme)
