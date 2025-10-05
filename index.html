@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WASM Adventure</title>
+</head>
+<body>
+  <div id="story"></div>
+  <input id="choice" type="text" />
+  <button onclick="makeChoice()">Choose</button>
+
+  <script type="module">
+    import init, { get_current_scene_description, choose_option } from './pkg/your_wasm_pkg.js';
+
+    async function run() {
+      await init();
+      document.getElementById('story').textContent = get_current_scene_description();
+    }
+
+    window.makeChoice = () => {
+      const choice = document.getElementById('choice').value;
+      choose_option(Number(choice));
+      document.getElementById('story').textContent = get_current_scene_description();
+    }
+
+    run();
+  </script>
+</body>
+</html>
