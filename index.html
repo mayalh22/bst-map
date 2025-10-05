@@ -1,25 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>WASM Adventure</title>
+  <meta charset="UTF-8" />
+  <title>Boston Adventure</title>
 </head>
 <body>
-  <div id="story"></div>
-  <input id="choice" type="text" />
-  <button onclick="makeChoice()">Choose</button>
-
+  <h1>Boston Adventure Game</h1>
+  <button id="start">Start Adventure</button>
   <script type="module">
-import init, { get_current_scene_description, choose_option } from './pkg/boston_adventure.js';
+    import init, { start_adventure } from './pkg/boston_adventure.js';
 
     async function run() {
       await init();
-      document.getElementById('story').textContent = get_current_scene_description();
-    }
-
-    window.makeChoice = () => {
-      const choice = document.getElementById('choice').value;
-      choose_option(Number(choice));
-      document.getElementById('story').textContent = get_current_scene_description();
+      document.getElementById('start').onclick = () => {
+        start_adventure();
+      };
     }
 
     run();
