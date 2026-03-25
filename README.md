@@ -1,16 +1,42 @@
-# boston adventure
+# Boston Adventure
 
-ok hello!
+## Overview
 
-this is a boston themed adventure game where you wake up in fenway and make different choices for different outcomes
+Hello!
 
-i used wasm and rust (both for the first time if that is not obvious) and a whole buttload of help from youtube videos and gemini
+This is a Boston-themed adventure game where you wake up in Fenway and make different choices that lead to different outcomes.
 
-- i also used javascript and html to load the wasm module and display to ui
+## TechTechTechTech
 
-i wanted to learn a new language because i so have been stuck in the html/css/js hole. it has been quite a challenge. i'm 99% sure it works but the ux is not as developed.
+This project was built using:
 
-i may try and work on more story branches, images, and user interface stuff in the future
+- Rust (compiled to WebAssembly)
+- WebAssembly (Wasm)
+- JavaScript
+- HTML
 
-for now, enjoy!
+Rust handles the core game logic, while JavaScript and HTML are used to load the Wasm module and display the user interface.
+
+## About
+
+I wanted to learn a new language because I’ve been stuck in the HTML/CSS/JavaScript hole for a while. This was my first time using both Rust and WebAssembly, so it was a challenge!!!
+
+I used a lot of help from YouTube videos and Gemini... (for debugging I promise)
+
+## Current State
+
+The game is mostly functional (I’m about 99% sure it works), but the user experience is still pretty basic.
+
+## Future Stuff
+
+I may expand the project with:
+
+- More story branches
+- Images and visual elements
+- Improved user interface and UX
+
+## Try It Out
+
+ENJOY!!!!!!!
+
 [![Athena Award Badge](https://img.shields.io/endpoint?url=https%3A%2F%2Faward.athena.hackclub.com%2Fapi%2Fbadge)](https://award.athena.hackclub.com?utm_source=readme)
