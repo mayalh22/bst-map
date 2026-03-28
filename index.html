@@ -221,6 +221,7 @@
   const kbdHint     = document.getElementById('kbd-hint');
 
   let worker     = null;
+  let sabView    = null;
   let trailItems = [];
   let alertBuf   = [];   // buffer alert() calls until prompt() arrives
   let waitingForPrompt = false;
@@ -306,9 +307,12 @@
   }
 
   function sendAnswer(key) {
-    if (!worker) return;
+    if (!sabView) return;
     hideChoices();
-    worker.postMessage({ type: 'answer', value: key });
+    // Write answer directly into SAB and notify the blocked worker
+    Atomics.store(sabView, 1, key.charCodeAt(0));
+    Atomics.store(sabView, 0, 1);
+    Atomics.notify(sabView, 0, 1);
   }
 
   document.addEventListener('keydown', (e) => {
@@ -345,7 +349,9 @@
         endMsg.textContent = endText;
         endScreen.classList.remove('hidden');
         // Send blank answer so Wasm loop can exit cleanly
-        worker.postMessage({ type: 'answer', value: ' ' });
+        Atomics.store(sabView, 1, 32);
+        Atomics.store(sabView, 0, 1);
+        Atomics.notify(sabView, 0, 1);
         return;
       }
 
@@ -354,7 +360,9 @@
       if (choices.length === 0) {
         // No choices needed (e.g. quit path) — auto-answer
         waitingForPrompt = false;
-        worker.postMessage({ type: 'answer', value: ' ' });
+        Atomics.store(sabView, 1, 32);
+        Atomics.store(sabView, 0, 1);
+        Atomics.notify(sabView, 0, 1);
         return;
       }
 
@@ -375,6 +383,7 @@
     waitingForPrompt = false;
 
     const sab  = new SharedArrayBuffer(8);
+    sabView = new Int32Array(sab);
 
     worker = new Worker('./game-worker.js', { type: 'module' });
     worker.onmessage = handleWorkerMessage;
