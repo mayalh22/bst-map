@@ -2,22 +2,656 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Boston Adventure</title>
-</head>
-<body>
-  <h1>Boston Adventure Game</h1>
-  <button id="start">Start Adventure</button>
-  <script type="module">
-import init, { start_adventure } from './pkg/boston_adventure.js';
-
-    async function run() {
-      await init();
-      document.getElementById('start').onclick = () => {
-        start_adventure();
-      };
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green:  #00843D; /* MBTA Green Line */
+      --red:    #DA291C; /* MBTA Red Line */
+      --orange: #ED8B00; /* MBTA Orange Line */
+      --blue:   #003DA5; /* MBTA Blue Line */
+      --cream:  #F5F0E8;
+      --ink:    #1A1208;
+      --paper:  #EDE8DC;
+      --rule:   #C8BFA8;
     }
 
-    run();
-  </script>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--ink);
+      color: var(--cream);
+      font-family: 'IBM Plex Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      overflow-x: hidden;
+    }
+
+    /* Subtle noise overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    #app {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 680px;
+    }
+
+    /* ── Header ── */
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .mbta-strip {
+      display: flex;
+      height: 6px;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    .mbta-strip span {
+      flex: 1;
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      color: var(--cream);
+    }
+
+    header h1 em {
+      font-style: normal;
+      color: var(--green);
+    }
+
+    .tagline {
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--rule);
+      margin-top: 0.5rem;
+    }
+
+    /* ── Game Card ── */
+    #game-card {
+      background: var(--paper);
+      color: var(--ink);
+      border-radius: 2px;
+      padding: 2rem 2.5rem;
+      border-top: 4px solid var(--green);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 2px 0 var(--rule);
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* ── Story text ── */
+    #story-log {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .story-line {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: var(--ink);
+      opacity: 0;
+      transform: translateY(6px);
+      animation: fadeUp 0.35s ease forwards;
+    }
+
+    .story-line.narrator {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 400;
+      color: #2a1f0a;
+    }
+
+    .story-line.system {
+      color: var(--green);
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      border-left: 2px solid var(--green);
+      padding-left: 0.75rem;
+    }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Choices ── */
+    #choices {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .choice-btn {
+      background: transparent;
+      border: 1.5px solid var(--rule);
+      color: var(--ink);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.82rem;
+      padding: 0.7rem 1rem;
+      text-align: left;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .choice-btn .num {
+      font-weight: 700;
+      color: var(--green);
+      min-width: 1.2rem;
+    }
+
+    .choice-btn:hover {
+      background: var(--green);
+      border-color: var(--green);
+      color: white;
+      transform: translateX(4px);
+    }
+
+    .choice-btn:hover .num { color: white; }
+
+    .choice-btn:active {
+      transform: translateX(2px) scale(0.99);
+    }
+
+    /* ── Start screen ── */
+    #start-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 1.5rem;
+      padding: 2rem 0;
+    }
+
+    #start-screen p {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      color: #5a4a2a;
+      max-width: 380px;
+      line-height: 1.6;
+    }
+
+    #start-btn {
+      background: var(--green);
+      color: white;
+      border: none;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.9rem 2.5rem;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 0 #005a2a;
+    }
+
+    #start-btn:hover {
+      background: #00a34c;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 #005a2a;
+    }
+
+    #start-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 0 #005a2a;
+    }
+
+    /* ── End screen ── */
+    #end-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.2rem;
+      padding: 1rem 0;
+      text-align: center;
+    }
+
+    .end-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .end-msg {
+      font-size: 0.85rem;
+      color: #5a4a2a;
+      line-height: 1.6;
+    }
+
+    #restart-btn {
+      background: transparent;
+      border: 1.5px solid var(--ink);
+      color: var(--ink);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.7rem 2rem;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.15s ease;
+      margin-top: 0.5rem;
+    }
+
+    #restart-btn:hover {
+      background: var(--ink);
+      color: var(--cream);
+    }
+
+    /* ── Breadcrumb trail ── */
+    #trail {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      align-items: center;
+      margin-top: 1.5rem;
+      min-height: 1.4rem;
+    }
+
+    .crumb {
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--rule);
+      opacity: 0;
+      animation: fadeUp 0.3s ease forwards;
+    }
+
+    .crumb::after {
+      content: ' ›';
+      color: var(--green);
+    }
+
+    .crumb:last-child::after { content: ''; }
+
+    /* ── Keyboard hint ── */
+    .kbd-hint {
+      text-align: center;
+      font-size: 0.65rem;
+      color: var(--rule);
+      letter-spacing: 0.1em;
+      margin-top: 0.75rem;
+    }
+
+    kbd {
+      display: inline-block;
+      border: 1px solid var(--rule);
+      border-radius: 2px;
+      padding: 0 4px;
+      font-size: 0.6rem;
+      background: rgba(255,255,255,0.05);
+    }
+
+    /* ── Hidden ── */
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <div class="mbta-strip">
+      <span style="background:#DA291C"></span>
+      <span style="background:#ED8B00"></span>
+      <span style="background:#00843D"></span>
+      <span style="background:#003DA5"></span>
+    </div>
+    <h1>Boston <em>Adventure</em></h1>
+    <p class="tagline">A text adventure set in the Hub</p>
+  </header>
+
+  <div id="game-card">
+
+    <!-- Start screen -->
+    <div id="start-screen">
+      <p>You wake up at Fenway. The city spreads out before you: boba shops, hidden speakeasies, lost dogs, and one very determined rat.</p>
+      <button id="start-btn">Board the T →</button>
+    </div>
+
+    <!-- Story log (hidden until started) -->
+    <div id="story-log" class="hidden"></div>
+
+    <!-- Choice buttons -->
+    <div id="choices" class="hidden"></div>
+
+    <!-- End screen -->
+    <div id="end-screen" class="hidden">
+      <div class="end-title">The End.</div>
+      <div class="end-msg" id="end-msg"></div>
+      <button id="restart-btn">↩ Play Again</button>
+    </div>
+
+  </div>
+
+  <!-- Breadcrumb trail -->
+  <div id="trail"></div>
+  <p class="kbd-hint hidden" id="kbd-hint">press <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> to choose</p>
+
+</div>
+
+<script type="module">
+import init from './pkg/boston_adventure.js';
+
+// ── State ──────────────────────────────────────────────────────────
+let pendingResolve = null;
+let messageBuffer  = [];
+let isProcessing   = false;
+let trailItems     = [];
+
+const startScreen = document.getElementById('start-screen');
+const storyLog    = document.getElementById('story-log');
+const choicesDiv  = document.getElementById('choices');
+const endScreen   = document.getElementById('end-screen');
+const endMsg      = document.getElementById('end-msg');
+const trail       = document.getElementById('trail');
+const kbdHint     = document.getElementById('kbd-hint');
+
+// ── UI helpers ─────────────────────────────────────────────────────
+function addStoryLine(text, cls = '') {
+  const el = document.createElement('div');
+  el.className = 'story-line ' + cls;
+  el.style.animationDelay = '0ms';
+  el.textContent = text;
+  storyLog.appendChild(el);
+  storyLog.scrollTop = storyLog.scrollHeight;
+}
+
+function clearLog() {
+  storyLog.innerHTML = '';
+}
+
+function addCrumb(text) {
+  trailItems.push(text);
+  renderTrail();
+}
+
+function renderTrail() {
+  trail.innerHTML = '';
+  trailItems.forEach((t, i) => {
+    const el = document.createElement('span');
+    el.className = 'crumb';
+    el.style.animationDelay = i * 40 + 'ms';
+    el.textContent = t;
+    trail.appendChild(el);
+  });
+}
+
+function showChoices(options) {
+  choicesDiv.classList.remove('hidden');
+  choicesDiv.innerHTML = '';
+  options.forEach((opt) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.innerHTML = `<span class="num">${opt.key}</span><span>${opt.label}</span>`;
+    btn.dataset.key = opt.key;
+    btn.onclick = () => selectChoice(opt.key);
+    choicesDiv.appendChild(btn);
+  });
+}
+
+function hideChoices() {
+  choicesDiv.classList.add('hidden');
+  choicesDiv.innerHTML = '';
+}
+
+function selectChoice(key) {
+  hideChoices();
+  kbdHint.classList.add('hidden');
+  if (pendingResolve) {
+    pendingResolve(String(key));
+    pendingResolve = null;
+  }
+}
+
+function showEnd(text) {
+  hideChoices();
+  storyLog.classList.add('hidden');
+  endMsg.textContent = text;
+  endScreen.classList.remove('hidden');
+  kbdHint.classList.add('hidden');
+}
+
+// ── Keyboard support ────────────────────────────────────────────────
+document.addEventListener('keydown', (e) => {
+  if (!pendingResolve) return;
+  const n = parseInt(e.key);
+  if (n >= 1 && n <= 9) {
+    const btn = choicesDiv.querySelector(`[data-key="${n}"]`);
+    if (btn) {
+      btn.style.background = 'var(--green)';
+      btn.style.color = 'white';
+      setTimeout(() => selectChoice(n), 120);
+    }
+  }
+});
+
+// ── Message parser ──────────────────────────────────────────────────
+// The Wasm calls alert() multiple times per scene, then prompt() once.
+// We collect alert messages, then on prompt() we parse them into
+// story text + choices and render the UI.
+
+function parseScene(messages) {
+  const narratorLines = [];
+  const choices = [];
+  let isChooser = false;
+
+  for (const msg of messages) {
+    // Choice lines: "1. something"
+    if (/^\d+\./.test(msg)) {
+      isChooser = true;
+      const m = msg.match(/^(\d+)\.\s*(.+)/);
+      if (m) choices.push({ key: parseInt(m[1]), label: m[2] });
+    } else if (/^>\s*choose/i.test(msg)) {
+      // skip the "> choose 1, 2..." prompt hints
+    } else {
+      narratorLines.push(msg);
+    }
+  }
+
+  return { narratorLines, choices };
+}
+
+// Determine if scene is an "ending" (terminal node)
+function isEndScene(messages) {
+  return messages.some(m => /press enter to continue/i.test(m));
+}
+
+// Extract the location name for the breadcrumb from narrator lines
+const locationMap = {
+  'fenway':    'Fenway',
+  'newbury':   'Newbury St',
+  'newton':    'Newton',
+  'alley':     'The Alley',
+  'boba':      'Boba Shop',
+  'bookstore': 'Bookstore',
+  'cafe':      'Cafe',
+  'park':      'Newton Park',
+  'speakeasy': 'Speakeasy',
+  'graffiti':  'Alley Art',
+};
+
+function extractCrumb(narratorLines) {
+  const text = narratorLines.join(' ').toLowerCase();
+  for (const [key, label] of Object.entries(locationMap)) {
+    if (text.includes(key)) return label;
+  }
+  return null;
+}
+
+// ── Intercept window.alert and window.prompt ────────────────────────
+const originalAlert  = window.alert.bind(window);
+const originalPrompt = window.prompt.bind(window);
+
+window.alert = function(msg) {
+  if (typeof msg !== 'string') msg = String(msg ?? '');
+  messageBuffer.push(msg);
+};
+
+window.prompt = function(msg) {
+  if (typeof msg !== 'string') msg = String(msg ?? '');
+
+  const messages = [...messageBuffer];
+  messageBuffer = [];
+
+  if (isEndScene(messages)) {
+    // Filter out "press enter" line, show last real line as end message
+    const endText = messages.filter(m => !/press enter/i.test(m)).join(' ');
+    setTimeout(() => showEnd(endText), 50);
+    return '';
+  }
+
+  const { narratorLines, choices } = parseScene(messages);
+
+  // Render story lines with stagger
+  narratorLines.forEach((line, i) => {
+    setTimeout(() => {
+      addStoryLine(line, 'narrator');
+    }, i * 80);
+  });
+
+  // Track breadcrumb
+  const crumb = extractCrumb(narratorLines);
+  if (crumb && (trailItems.length === 0 || trailItems[trailItems.length - 1] !== crumb)) {
+    setTimeout(() => addCrumb(crumb), narratorLines.length * 80 + 100);
+  }
+
+  if (choices.length === 0) {
+    // "quit" or unknown — just continue
+    return '';
+  }
+
+  // Show choices after story lines appear
+  const delay = narratorLines.length * 80 + 200;
+  setTimeout(() => {
+    showChoices(choices);
+    kbdHint.classList.remove('hidden');
+  }, delay);
+
+  // Return a promise-like: Wasm is sync, so we use a synchronous block
+  // via a dirty-but-effective busy-wait shim using Atomics
+  // (Falls back to returning '' if SharedArrayBuffer is unavailable)
+  return waitForChoice();
+};
+
+function waitForChoice() {
+  // Try Atomics-based sync wait (requires COOP/COEP headers or same-origin)
+  if (typeof SharedArrayBuffer !== 'undefined' && typeof Atomics !== 'undefined') {
+    const sab = new SharedArrayBuffer(8);
+    const view = new Int32Array(sab);
+    // Store the result in a second slot (encode as char code, max 1 digit)
+    Atomics.store(view, 0, 0); // 0 = waiting
+
+    pendingResolve = (val) => {
+      // store char code of the answer digit
+      Atomics.store(view, 1, val.charCodeAt(0));
+      Atomics.store(view, 0, 1); // signal ready
+      Atomics.notify(view, 0);
+    };
+
+    Atomics.wait(view, 0, 0); // blocks until notified
+    const result = String.fromCharCode(Atomics.load(view, 1));
+    pendingResolve = null;
+    return result;
+  }
+
+  // Fallback: async-incompatible — gather choice via a captured variable
+  // In this path the Wasm loop can't truly block; we use a manual queue approach
+  // by restarting the Wasm from JS after each scene (see advanceScene below)
+  return '__ASYNC__';
+}
+
+// ── Async fallback scene runner ──────────────────────────────────────
+// If SharedArrayBuffer isn't available, we run the game scene-by-scene
+// by re-calling start_adventure each time with a known scene override.
+// Since Maya's Wasm is one big loop driven by alert/prompt, we handle
+// the async path by collecting a queued answer before the Wasm resumes.
+
+let queuedAnswer = null;
+
+function asyncPromptFallback(resolve) {
+  pendingResolve = (val) => {
+    resolve(val);
+  };
+}
+
+// ── Boot ────────────────────────────────────────────────────────────
+async function run() {
+  await init();
+
+  document.getElementById('start-btn').onclick = startGame;
+  document.getElementById('restart-btn').onclick = restartGame;
+}
+
+function startGame() {
+  startScreen.classList.add('hidden');
+  storyLog.classList.remove('hidden');
+  trailItems = [];
+  renderTrail();
+  clearLog();
+
+  // Import and call start_adventure
+  import('./pkg/boston_adventure.js').then(({ start_adventure }) => {
+    try {
+      start_adventure();
+    } catch(e) {
+      // Wasm may throw on async path — that's okay
+    }
+  });
+}
+
+function restartGame() {
+  endScreen.classList.add('hidden');
+  storyLog.classList.remove('hidden');
+  kbdHint.classList.add('hidden');
+  hideChoices();
+  clearLog();
+  messageBuffer = [];
+  trailItems = [];
+  renderTrail();
+
+  import('./pkg/boston_adventure.js').then(({ start_adventure }) => {
+    try {
+      start_adventure();
+    } catch(e) {}
+  });
+}
+
+run();
+</script>
 </body>
 </html>
