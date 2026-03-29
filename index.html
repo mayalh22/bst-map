@@ -170,12 +170,12 @@
       <span style="background:#003DA5"></span>
     </div>
     <h1>Boston <em>Adventure</em></h1>
-    <p class="tagline">A text adventure set in Boston</p>
+    <p class="tagline">A text adventure set in Boston...By Maya Hazarika!</p>
   </header>
 
   <div id="game-card">
     <div id="start-screen">
-      <p>You wake up at Fenway. The city spreads out before you — boba shops, hidden speakeasies, lost dogs, and one very determined rat.</p>
+      <p>You wake up at Fenway. The city spreads out before you: boba shops, hidden speakeasies, lost dogs, and one very determined rat.</p>
       <button id="start-btn">Board the T →</button>
     </div>
     <div id="story-log" class="hidden"></div>
@@ -222,6 +222,7 @@
 
   let worker     = null;
   let sabView    = null;
+  let shownLines = new Set();
   let trailItems = [];
   let alertBuf   = [];   // buffer alert() calls until prompt() arrives
   let waitingForPrompt = false;
@@ -235,7 +236,7 @@
     storyLog.scrollTop = storyLog.scrollHeight;
   }
 
-  function clearLog() { storyLog.innerHTML = ''; }
+  function clearLog() { storyLog.innerHTML = ''; shownLines = new Set(); }
 
   const locationMap = {
     'fenway': 'Fenway', 'newbury': 'Newbury St', 'newton': 'Newton',
@@ -267,11 +268,16 @@
       } else if (/^>\s*choose/i.test(msg)) {
         // skip
       } else {
-        narratorLines.push(msg);
+        // Skip meta/intro lines that don't add story value
+        if (/welcome to boston adventure/i.test(msg)) continue;
+        if (/what do you want to do/i.test(msg)) continue;
+        if (/invalid choice/i.test(msg)) continue;
+        if (!shownLines.has(msg)) narratorLines.push(msg);
       }
     }
 
     narratorLines.forEach((line, i) => {
+      shownLines.add(line);
       setTimeout(() => addLine(line), i * 80);
     });
 
